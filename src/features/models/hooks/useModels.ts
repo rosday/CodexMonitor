@@ -164,16 +164,10 @@ export function useModels({
     if (!preferredSelection) {
       return;
     }
-    const preferredCodex =
-      models.find((model) => model.model === "gpt-5.2-codex") ?? null;
-    const defaultModel =
-      preferredCodex ?? models.find((model) => model.isDefault) ?? models[0] ?? null;
-    const shouldApplyPreferredModel =
-      !selectedModelId ||
-      (defaultModel &&
-        selectedModelId === defaultModel.id &&
-        selectedModelId !== preferredSelection.id);
-    if (shouldApplyPreferredModel) {
+    const hasSelection = selectedModelId
+      ? models.some((model) => model.id === selectedModelId)
+      : false;
+    if (!hasSelection) {
       setSelectedModelId(preferredSelection.id);
       const nextEffort =
         preferredEffort &&
@@ -194,8 +188,7 @@ export function useModels({
     if (!preferredEffortSupported) {
       return;
     }
-    const defaultEffort = preferredSelection.defaultReasoningEffort ?? null;
-    if (!selectedEffort || selectedEffort === defaultEffort) {
+    if (!selectedEffort) {
       setSelectedEffort(preferredEffort);
     }
   }, [models, preferredEffort, preferredModelId, selectedEffort, selectedModelId]);
