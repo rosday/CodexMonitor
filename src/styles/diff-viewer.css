@@ -17,7 +17,7 @@
 }
 
 .diff-viewer-pr {
-  margin: 12px 16px 0;
+  margin: 12px 16px 16px;
   padding: 16px;
   border-radius: 14px;
   border: 1px solid var(--border-subtle);
