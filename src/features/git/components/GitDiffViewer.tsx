@@ -233,7 +233,7 @@ export function GitDiffViewer({
                   data-index={virtualRow.index}
                   ref={rowVirtualizer.measureElement}
                   style={{
-                    transform: `translateY(${virtualRow.start}px)`,
+                    top: virtualRow.start,
                   }}
                 >
                   <DiffCard
