@@ -96,7 +96,8 @@ function MainApp() {
     settings: appSettings,
     setSettings: setAppSettings,
     saveSettings,
-    doctor
+    doctor,
+    isLoading: appSettingsLoading
   } = useAppSettings();
   const dictationModel = useDictationModel(appSettings.dictationModelId);
   const {
@@ -493,6 +494,9 @@ function MainApp() {
     diffSource === "pr" ? gitPullRequestDiffsError : diffError;
 
   useEffect(() => {
+    if (appSettingsLoading) {
+      return;
+    }
     if (!selectedModelId && selectedEffort === null) {
       return;
     }
@@ -511,7 +515,13 @@ function MainApp() {
       void queueSaveSettings(nextSettings);
       return nextSettings;
     });
-  }, [queueSaveSettings, selectedEffort, selectedModelId, setAppSettings]);
+  }, [
+    appSettingsLoading,
+    queueSaveSettings,
+    selectedEffort,
+    selectedModelId,
+    setAppSettings,
+  ]);
 
   useEffect(() => {
     if (diffSource !== "pr" || centerMode !== "diff") {
