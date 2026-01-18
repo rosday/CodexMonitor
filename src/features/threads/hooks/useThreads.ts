@@ -456,6 +456,22 @@ export function useThreads({
     }
   }, [onMessageActivity]);
 
+  const wouldCreateThreadCycle = useCallback(
+    (parentId: string, childId: string) => {
+      const visited = new Set([childId]);
+      let current: string | undefined = parentId;
+      while (current) {
+        if (visited.has(current)) {
+          return true;
+        }
+        visited.add(current);
+        current = state.threadParentById[current];
+      }
+      return false;
+    },
+    [state.threadParentById],
+  );
+
   const updateThreadParent = useCallback(
     (workspaceId: string, parentId: string, childIds: string[]) => {
       if (!parentId || childIds.length === 0) {
@@ -465,11 +481,21 @@ export function useThreads({
         if (!childId || childId === parentId) {
           return;
         }
+        const existingParent = state.threadParentById[childId];
+        if (existingParent === parentId) {
+          return;
+        }
+        if (existingParent) {
+          return;
+        }
+        if (wouldCreateThreadCycle(parentId, childId)) {
+          return;
+        }
         dispatch({ type: "ensureThread", workspaceId, threadId: childId });
         dispatch({ type: "setThreadParent", threadId: childId, parentId });
       });
     },
-    [],
+    [state.threadParentById, wouldCreateThreadCycle],
   );
 
   const applyCollabThreadLinks = useCallback(
