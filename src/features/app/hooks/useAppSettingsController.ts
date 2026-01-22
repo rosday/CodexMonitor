@@ -13,8 +13,11 @@ export function useAppSettingsController() {
   } = useAppSettings();
 
   useThemePreference(appSettings.theme);
-  const { reduceTransparency, setReduceTransparency } =
-    useTransparencyPreference();
+  const {
+    transparencyMode,
+    setTransparencyMode,
+    availableModes: transparencyModes,
+  } = useTransparencyPreference();
 
   const {
     uiScale,
@@ -34,8 +37,9 @@ export function useAppSettingsController() {
     queueSaveSettings,
     doctor,
     appSettingsLoading,
-    reduceTransparency,
-    setReduceTransparency,
+    transparencyMode,
+    setTransparencyMode,
+    transparencyModes,
     uiScale,
     scaleShortcutTitle,
     scaleShortcutText,

@@ -5,14 +5,14 @@ import {
   GlassMaterialVariant,
 } from "tauri-plugin-liquid-glass-api";
 import { Effect, EffectState, getCurrentWindow } from "@tauri-apps/api/window";
-import type { DebugEntry } from "../../../types";
+import type { DebugEntry, TransparencyMode } from "../../../types";
 
 type Params = {
-  reduceTransparency: boolean;
+  transparencyMode: TransparencyMode;
   onDebug?: (entry: DebugEntry) => void;
 };
 
-export function useLiquidGlassEffect({ reduceTransparency, onDebug }: Params) {
+export function useLiquidGlassEffect({ transparencyMode, onDebug }: Params) {
   const supportedRef = useRef<boolean | null>(null);
 
   useEffect(() => {
@@ -21,36 +21,33 @@ export function useLiquidGlassEffect({ reduceTransparency, onDebug }: Params) {
     const apply = async () => {
       try {
         const window = getCurrentWindow();
-        if (reduceTransparency) {
-          if (supportedRef.current === null) {
-            supportedRef.current = await isGlassSupported();
-          }
-          if (supportedRef.current) {
-            await setLiquidGlassEffect({ enabled: false });
-          }
-          await window.setEffects({ effects: [] });
-          return;
-        }
-
         if (supportedRef.current === null) {
           supportedRef.current = await isGlassSupported();
         }
         if (cancelled) {
           return;
         }
-        if (supportedRef.current) {
+        if (supportedRef.current && transparencyMode !== "glass") {
+          await setLiquidGlassEffect({ enabled: false });
+        }
+
+        const userAgent = navigator.userAgent ?? "";
+        const isMac = userAgent.includes("Macintosh");
+        const isLinux = userAgent.includes("Linux");
+        if (transparencyMode === "reduced") {
+          await window.setEffects({ effects: [] });
+          return;
+        }
+
+        if (supportedRef.current && transparencyMode === "glass") {
           await window.setEffects({ effects: [] });
           await setLiquidGlassEffect({
-            enabled: true,
             cornerRadius: 16,
             variant: GlassMaterialVariant.Regular,
           });
           return;
         }
 
-        const userAgent = navigator.userAgent ?? "";
-        const isMac = userAgent.includes("Macintosh");
-        const isLinux = userAgent.includes("Linux");
         if (!isMac && !isLinux) {
           return;
         }
@@ -78,5 +75,5 @@ export function useLiquidGlassEffect({ reduceTransparency, onDebug }: Params) {
     return () => {
       cancelled = true;
     };
-  }, [onDebug, reduceTransparency]);
+  }, [onDebug, transparencyMode]);
 }

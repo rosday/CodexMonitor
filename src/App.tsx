@@ -115,8 +115,9 @@ function MainApp() {
     setAppSettings,
     doctor,
     appSettingsLoading,
-    reduceTransparency,
-    setReduceTransparency,
+    transparencyMode,
+    setTransparencyMode,
+    transparencyModes,
     uiScale,
     scaleShortcutTitle,
     scaleShortcutText,
@@ -144,7 +145,7 @@ function MainApp() {
     handleCopyDebug,
     clearDebugEntries,
   } = useDebugLog();
-  useLiquidGlassEffect({ reduceTransparency, onDebug: addDebugEntry });
+  useLiquidGlassEffect({ transparencyMode, onDebug: addDebugEntry });
   const [accessMode, setAccessMode] = useState<AccessMode>("current");
   const [activeTab, setActiveTab] = useState<
     "projects" | "codex" | "git" | "log"
@@ -1275,7 +1276,7 @@ function MainApp() {
   const appClassName = `app ${isCompact ? "layout-compact" : "layout-desktop"}${
     isPhone ? " layout-phone" : ""
   }${isTablet ? " layout-tablet" : ""}${
-    reduceTransparency ? " reduced-transparency" : ""
+    transparencyMode === "reduced" ? " reduced-transparency" : ""
   }${!isCompact && sidebarCollapsed ? " sidebar-collapsed" : ""}${
     !isCompact && rightPanelCollapsed ? " right-panel-collapsed" : ""
   }${isDefaultScale ? " ui-scale-default" : ""}`;
@@ -1748,8 +1749,9 @@ function MainApp() {
           onMoveWorkspaceGroup: moveWorkspaceGroup,
           onDeleteWorkspaceGroup: deleteWorkspaceGroup,
           onAssignWorkspaceGroup: assignWorkspaceGroup,
-          reduceTransparency,
-          onToggleTransparency: setReduceTransparency,
+          transparencyMode,
+          transparencyModes,
+          onTransparencyModeChange: setTransparencyMode,
           appSettings,
           onUpdateAppSettings: async (next) => {
             await queueSaveSettings(next);

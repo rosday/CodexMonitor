@@ -16,6 +16,7 @@ import type {
   AppSettings,
   CodexDoctorResult,
   DictationModelStatus,
+  TransparencyMode,
   WorkspaceGroup,
   WorkspaceInfo,
 } from "../../../types";
@@ -112,8 +113,9 @@ export type SettingsViewProps = {
     workspaceId: string,
     groupId: string | null,
   ) => Promise<boolean | null>;
-  reduceTransparency: boolean;
-  onToggleTransparency: (value: boolean) => void;
+  transparencyMode: TransparencyMode;
+  transparencyModes: TransparencyMode[];
+  onTransparencyModeChange: (value: TransparencyMode) => void;
   appSettings: AppSettings;
   onUpdateAppSettings: (next: AppSettings) => Promise<void>;
   onRunDoctor: (codexBin: string | null) => Promise<CodexDoctorResult>;
@@ -190,8 +192,9 @@ export function SettingsView({
   onMoveWorkspaceGroup,
   onDeleteWorkspaceGroup,
   onAssignWorkspaceGroup,
-  reduceTransparency,
-  onToggleTransparency,
+  transparencyMode,
+  transparencyModes,
+  onTransparencyModeChange,
   appSettings,
   onUpdateAppSettings,
   onRunDoctor,
@@ -251,6 +254,14 @@ export function SettingsView({
       ) ?? DICTATION_MODELS[1]
     );
   }, [appSettings.dictationModelId]);
+  const transparencyLabels: Record<TransparencyMode, string> = {
+    glass: "Glass",
+    blur: "Blur",
+    reduced: "Reduced",
+  };
+  const transparencySubtitle = transparencyModes.includes("glass")
+    ? "Choose glass, blur, or reduced surfaces."
+    : "Choose blur or reduced surfaces.";
 
   const projects = useMemo(
     () => groupedWorkspaces.flatMap((group) => group.workspaces),
@@ -978,19 +989,31 @@ export function SettingsView({
                 </div>
                 <div className="settings-toggle-row">
                   <div>
-                    <div className="settings-toggle-title">Reduce transparency</div>
+                    <div className="settings-toggle-title">Transparency</div>
                     <div className="settings-toggle-subtitle">
-                      Use solid surfaces instead of glass.
+                      {transparencySubtitle}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className={`settings-toggle ${reduceTransparency ? "on" : ""}`}
-                    onClick={() => onToggleTransparency(!reduceTransparency)}
-                    aria-pressed={reduceTransparency}
+                  <div
+                    className="settings-segmented"
+                    role="radiogroup"
+                    aria-label="Transparency"
                   >
-                    <span className="settings-toggle-knob" />
-                  </button>
+                    {transparencyModes.map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        className={`settings-segmented-button ${
+                          transparencyMode === mode ? "active" : ""
+                        }`}
+                        onClick={() => onTransparencyModeChange(mode)}
+                        role="radio"
+                        aria-checked={transparencyMode === mode}
+                      >
+                        {transparencyLabels[mode]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="settings-toggle-row settings-scale-row">
                   <div>

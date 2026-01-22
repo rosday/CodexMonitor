@@ -550,6 +550,39 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+.settings-segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-control);
+  border: 1px solid var(--border-muted);
+}
+
+.settings-segmented-button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.settings-segmented-button.active {
+  background: var(--surface-card-strong);
+  color: var(--text-strong);
+  border-color: var(--border-strong);
+}
+
+.app.reduced-transparency .settings-segmented {
+  background: var(--surface-control-hover);
+  border-color: var(--border-stronger);
+}
+
 @media (max-width: 720px) {
   .settings-body {
     grid-template-columns: 1fr;

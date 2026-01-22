@@ -81,18 +81,21 @@ const createDoctorResult = () => ({
 const renderDisplaySection = (
   options: {
     appSettings?: Partial<AppSettings>;
-    reduceTransparency?: boolean;
+    transparencyMode?: ComponentProps<typeof SettingsView>["transparencyMode"];
+    transparencyModes?: ComponentProps<typeof SettingsView>["transparencyModes"];
     onUpdateAppSettings?: ComponentProps<typeof SettingsView>["onUpdateAppSettings"];
-    onToggleTransparency?: ComponentProps<typeof SettingsView>["onToggleTransparency"];
+    onTransparencyModeChange?: ComponentProps<typeof SettingsView>["onTransparencyModeChange"];
   } = {},
 ) => {
   cleanup();
   const onUpdateAppSettings =
     options.onUpdateAppSettings ?? vi.fn().mockResolvedValue(undefined);
-  const onToggleTransparency = options.onToggleTransparency ?? vi.fn();
+  const onTransparencyModeChange =
+    options.onTransparencyModeChange ?? vi.fn();
   const props: ComponentProps<typeof SettingsView> = {
-    reduceTransparency: options.reduceTransparency ?? false,
-    onToggleTransparency,
+    transparencyMode: options.transparencyMode ?? "blur",
+    transparencyModes: options.transparencyModes ?? ["blur", "reduced"],
+    onTransparencyModeChange,
     appSettings: { ...baseSettings, ...options.appSettings },
     onUpdateAppSettings,
     workspaceGroups: [],
@@ -120,7 +123,7 @@ const renderDisplaySection = (
   render(<SettingsView {...props} />);
   fireEvent.click(screen.getByRole("button", { name: "Display & Sound" }));
 
-  return { onUpdateAppSettings, onToggleTransparency };
+  return { onUpdateAppSettings, onTransparencyModeChange };
 };
 
 describe("SettingsView Display", () => {
@@ -138,19 +141,23 @@ describe("SettingsView Display", () => {
     });
   });
 
-  it("toggles reduce transparency", () => {
-    const onToggleTransparency = vi.fn();
-    renderDisplaySection({ onToggleTransparency, reduceTransparency: false });
+  it("updates transparency mode", () => {
+    const onTransparencyModeChange = vi.fn();
+    renderDisplaySection({
+      onTransparencyModeChange,
+      transparencyMode: "blur",
+      transparencyModes: ["blur", "reduced"],
+    });
 
     const row = screen
-      .getByText("Reduce transparency")
+      .getByText("Transparency")
       .closest(".settings-toggle-row") as HTMLElement | null;
     if (!row) {
-      throw new Error("Expected reduce transparency row");
+      throw new Error("Expected transparency row");
     }
-    fireEvent.click(within(row).getByRole("button"));
+    fireEvent.click(within(row).getByRole("radio", { name: "Reduced" }));
 
-    expect(onToggleTransparency).toHaveBeenCalledWith(true);
+    expect(onTransparencyModeChange).toHaveBeenCalledWith("reduced");
   });
 
   it("commits interface scale on blur and enter with clamping", async () => {
@@ -280,8 +287,9 @@ describe("SettingsView Shortcuts", () => {
         onMoveWorkspaceGroup={vi.fn().mockResolvedValue(null)}
         onDeleteWorkspaceGroup={vi.fn().mockResolvedValue(null)}
         onAssignWorkspaceGroup={vi.fn().mockResolvedValue(null)}
-        reduceTransparency={false}
-        onToggleTransparency={vi.fn()}
+        transparencyMode="blur"
+        transparencyModes={["blur", "reduced"]}
+        onTransparencyModeChange={vi.fn()}
         appSettings={baseSettings}
         onUpdateAppSettings={vi.fn().mockResolvedValue(undefined)}
         onRunDoctor={vi.fn().mockResolvedValue(createDoctorResult())}
@@ -318,8 +326,9 @@ describe("SettingsView Shortcuts", () => {
         onMoveWorkspaceGroup={vi.fn().mockResolvedValue(null)}
         onDeleteWorkspaceGroup={vi.fn().mockResolvedValue(null)}
         onAssignWorkspaceGroup={vi.fn().mockResolvedValue(null)}
-        reduceTransparency={false}
-        onToggleTransparency={vi.fn()}
+        transparencyMode="blur"
+        transparencyModes={["blur", "reduced"]}
+        onTransparencyModeChange={vi.fn()}
         appSettings={baseSettings}
         onUpdateAppSettings={vi.fn().mockResolvedValue(undefined)}
         onRunDoctor={vi.fn().mockResolvedValue(createDoctorResult())}
