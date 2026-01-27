@@ -730,6 +730,7 @@ function MainApp() {
   const worktreeSetupScriptState = useWorktreeSetupScript({
     ensureTerminalWithTitle,
     restartTerminalSession,
+    openTerminal,
     onDebug: addDebugEntry,
   });
 
@@ -757,7 +758,6 @@ function MainApp() {
     cancelPrompt: cancelWorktreePrompt,
     updateBranch: updateWorktreeBranch,
     updateSetupScript: updateWorktreeSetupScript,
-    saveSetupScript: saveWorktreeSetupScript,
   } = useWorktreePrompt({
     addWorktreeAgent,
     updateWorkspaceSettings,
@@ -1933,9 +1933,6 @@ function MainApp() {
         worktreePrompt={worktreePrompt}
         onWorktreePromptChange={updateWorktreeBranch}
         onWorktreeSetupScriptChange={updateWorktreeSetupScript}
-        onWorktreeSetupScriptSave={() => {
-          void saveWorktreeSetupScript();
-        }}
         onWorktreePromptCancel={cancelWorktreePrompt}
         onWorktreePromptConfirm={confirmWorktreePrompt}
         clonePrompt={clonePrompt}

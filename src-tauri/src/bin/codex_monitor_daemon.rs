@@ -41,13 +41,13 @@ use types::{
 };
 
 const DEFAULT_LISTEN_ADDR: &str = "127.0.0.1:4732";
-const WORKTREE_SETUP_MARKER: &str = ".codex-monitor-worktree-setup.ran";
+const WORKTREE_SETUP_MARKERS_DIR: &str = "worktree-setup";
+const WORKTREE_SETUP_MARKER_EXT: &str = "ran";
 
-fn worktree_setup_marker_path(entry: &WorkspaceEntry) -> Option<PathBuf> {
-    if !entry.kind.is_worktree() {
-        return None;
-    }
-    Some(PathBuf::from(&entry.path).join(WORKTREE_SETUP_MARKER))
+fn worktree_setup_marker_path(data_dir: &PathBuf, workspace_id: &str) -> PathBuf {
+    data_dir
+        .join(WORKTREE_SETUP_MARKERS_DIR)
+        .join(format!("{workspace_id}.{WORKTREE_SETUP_MARKER_EXT}"))
 }
 
 fn normalize_setup_script(script: Option<String>) -> Option<String> {
@@ -352,9 +352,11 @@ impl DaemonState {
         };
 
         let script = normalize_setup_script(entry.settings.worktree_setup_script.clone());
-        let marker_exists = worktree_setup_marker_path(&entry)
-            .map(|path| path.exists())
-            .unwrap_or(false);
+        let marker_exists = if entry.kind.is_worktree() {
+            worktree_setup_marker_path(&self.data_dir, &entry.id).exists()
+        } else {
+            false
+        };
         let should_run = entry.kind.is_worktree() && script.is_some() && !marker_exists;
 
         Ok(WorktreeSetupStatus { should_run, script })
@@ -371,8 +373,7 @@ impl DaemonState {
         if !entry.kind.is_worktree() {
             return Err("Not a worktree workspace.".to_string());
         }
-        let marker_path = worktree_setup_marker_path(&entry)
-            .ok_or_else(|| "worktree marker path not found".to_string())?;
+        let marker_path = worktree_setup_marker_path(&self.data_dir, &entry.id);
         if let Some(parent) = marker_path.parent() {
             std::fs::create_dir_all(parent)
                 .map_err(|err| format!("Failed to prepare worktree marker directory: {err}"))?;

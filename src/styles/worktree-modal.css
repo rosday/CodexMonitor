@@ -97,11 +97,6 @@
   outline-offset: 1px;
 }
 
-.worktree-modal-inline-actions {
-  display: flex;
-  justify-content: flex-start;
-}
-
 .worktree-modal-actions {
   display: flex;
   justify-content: flex-end;

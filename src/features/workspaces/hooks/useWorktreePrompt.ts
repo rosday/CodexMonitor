@@ -35,7 +35,6 @@ type UseWorktreePromptResult = {
   cancelPrompt: () => void;
   updateBranch: (value: string) => void;
   updateSetupScript: (value: string) => void;
-  saveSetupScript: () => Promise<void>;
 };
 
 function normalizeSetupScript(value: string | null | undefined): string | null {
@@ -123,18 +122,6 @@ export function useWorktreePrompt({
     [updateWorkspaceSettings],
   );
 
-  const saveSetupScript = useCallback(async () => {
-    if (!worktreePrompt || worktreePrompt.isSavingScript) {
-      return;
-    }
-    try {
-      await persistSetupScript(worktreePrompt);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      onError?.(message);
-    }
-  }, [onError, persistSetupScript, worktreePrompt]);
-
   const confirmPrompt = useCallback(async () => {
     if (!worktreePrompt || worktreePrompt.isSubmitting) {
       return;
@@ -199,6 +186,5 @@ export function useWorktreePrompt({
     cancelPrompt,
     updateBranch,
     updateSetupScript,
-    saveSetupScript,
   };
 }

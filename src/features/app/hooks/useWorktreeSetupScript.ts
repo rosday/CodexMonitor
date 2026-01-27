@@ -16,6 +16,7 @@ const DEFAULT_TERMINAL_ROWS = 32;
 type UseWorktreeSetupScriptOptions = {
   ensureTerminalWithTitle: (workspaceId: string, terminalId: string, title: string) => string;
   restartTerminalSession: (workspaceId: string, terminalId: string) => Promise<void>;
+  openTerminal: () => void;
   onDebug?: (entry: DebugEntry) => void;
 };
 
@@ -26,6 +27,7 @@ export type WorktreeSetupScriptState = {
 export function useWorktreeSetupScript({
   ensureTerminalWithTitle,
   restartTerminalSession,
+  openTerminal,
   onDebug,
 }: UseWorktreeSetupScriptOptions): WorktreeSetupScriptState {
   const runningRef = useRef<Set<string>>(new Set());
@@ -46,6 +48,7 @@ export function useWorktreeSetupScript({
           return;
         }
 
+        openTerminal();
         const terminalId = ensureTerminalWithTitle(
           worktree.id,
           WORKTREE_SETUP_TERMINAL_ID,
@@ -72,11 +75,10 @@ export function useWorktreeSetupScript({
         runningRef.current.delete(worktree.id);
       }
     },
-    [ensureTerminalWithTitle, onDebug, restartTerminalSession],
+    [ensureTerminalWithTitle, onDebug, openTerminal, restartTerminalSession],
   );
 
   return {
     maybeRunWorktreeSetupScript,
   };
 }
-
