@@ -16,64 +16,67 @@ export function WorkspaceGroup({
   children,
 }: WorkspaceGroupProps) {
   const isToggleable = Boolean(toggleId);
-  return (
-    <div className="workspace-group">
-      <div className="workspace-group-card">
-        {showHeader && (
-          <div
-            className={`workspace-group-header${isToggleable ? " is-toggleable" : ""}`}
-            onClick={
-              toggleId
-                ? () => {
+  const content = (
+    <>
+      {showHeader && (
+        <div
+          className={`workspace-group-header${isToggleable ? " is-toggleable" : ""}`}
+          onClick={
+            toggleId
+              ? () => {
+                  onToggleCollapse(toggleId);
+                }
+              : undefined
+          }
+          onKeyDown={
+            toggleId
+              ? (event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
                     onToggleCollapse(toggleId);
                   }
-                : undefined
-            }
-            onKeyDown={
-              toggleId
-                ? (event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      onToggleCollapse(toggleId);
-                    }
-                  }
-                : undefined
-            }
-            role={isToggleable ? "button" : undefined}
-            aria-label={
-              isToggleable ? `${isCollapsed ? "Expand" : "Collapse"} group` : undefined
-            }
-            aria-expanded={isToggleable ? !isCollapsed : undefined}
-            tabIndex={isToggleable ? 0 : undefined}
-          >
-            <div className="workspace-group-label">{name}</div>
-            {isToggleable && (
-              <button
-                className={`group-toggle ${isCollapsed ? "" : "expanded"}`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  if (!toggleId) {
-                    return;
-                  }
-                  onToggleCollapse(toggleId);
-                }}
-                aria-label={isCollapsed ? "Expand group" : "Collapse group"}
-                aria-expanded={!isCollapsed}
-                type="button"
-              >
-                <span className="group-toggle-icon">›</span>
-              </button>
-            )}
-          </div>
-        )}
-        <div
-          className={`workspace-group-list${showHeader ? " has-header" : ""} ${
-            isCollapsed ? "collapsed" : ""
-          }`}
+                }
+              : undefined
+          }
+          role={isToggleable ? "button" : undefined}
+          aria-label={
+            isToggleable ? `${isCollapsed ? "Expand" : "Collapse"} group` : undefined
+          }
+          aria-expanded={isToggleable ? !isCollapsed : undefined}
+          tabIndex={isToggleable ? 0 : undefined}
         >
-          <div className="workspace-group-content">{children}</div>
+          <div className="workspace-group-label">{name}</div>
+          {isToggleable && (
+            <button
+              className={`group-toggle ${isCollapsed ? "" : "expanded"}`}
+              onClick={(event) => {
+                event.stopPropagation();
+                if (!toggleId) {
+                  return;
+                }
+                onToggleCollapse(toggleId);
+              }}
+              aria-label={isCollapsed ? "Expand group" : "Collapse group"}
+              aria-expanded={!isCollapsed}
+              type="button"
+            >
+              <span className="group-toggle-icon">›</span>
+            </button>
+          )}
         </div>
+      )}
+      <div
+        className={`workspace-group-list${showHeader ? " has-header" : ""} ${
+          isCollapsed ? "collapsed" : ""
+        }`}
+      >
+        <div className="workspace-group-content">{children}</div>
       </div>
+    </>
+  );
+  return (
+    <div className="workspace-group">
+      {showHeader ? <div className="workspace-group-card">{content}</div> : content}
     </div>
   );
 }
